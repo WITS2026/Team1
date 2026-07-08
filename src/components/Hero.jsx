@@ -7,10 +7,6 @@ function Hero() {
         <p className="text-xl text-gray-300 mb-6">
           Discover handcrafted luxury jewelry.
         </p>
-
-        <button className="bg-yellow-500 px-6 py-3 rounded-lg text-black font-semibold">
-          Shop Now
-        </button>
       </div>
     </section>
   );
