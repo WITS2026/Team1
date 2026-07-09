@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM Template for Shopping Cart API and DynamoDB Backend
+
+Globals:
+  Function:
+    Timeout: 10
+    Runtime: nodejs18.x 
+    Environment:
+      Variables:
+        TABLE_NAME: team1 # Perfect! This is exactly right.
+
+Resources:
+  # --- API Gateway ---
+  CartApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod 
+
+  # --- Lambda Functions ---
+  DeleteFromCartFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: deleteFromCart/
+      Handler: index.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: team1 # The policy goes here, inside the function!
+      Events:
+        DeleteEvent:
+          Type: Api
+          Properties:
+            Path: /deleteFromCart/user/{userId}/product/{productId}
+            Method: delete
+            RestApiId: !Ref CartApi
+
+  AddToCartFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: addToCart/
+      Handler: index.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: team1 # And here...
+      Events:
+        AddEvent:
+          Type: Api
+          Properties:
+            Path: /addToCart/user/{userId}/product/{productId}
+            Method: post
+            RestApiId: !Ref CartApi
+
+  GetProductFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: getProduct/
+      Handler: index.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: team1 # And here...
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /product/{itemId}
+            Method: get
+            RestApiId: !Ref CartApi
+
+  GetCartFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: getCart/
+      Handler: index.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: team1 # And here!
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /getCart/us
+            Method: get
+            RestApiId: !Ref CartApi
+
+Outputs:
+  ApiUrl:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${CartApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
