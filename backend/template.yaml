@@ -16,6 +16,10 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod 
+      Cors:
+        AllowMethods: "'GET,POST,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
 
   # --- Lambda Functions ---
   DeleteFromCartFunction:
@@ -78,7 +82,7 @@ Resources:
         GetEvent:
           Type: Api
           Properties:
-            Path: /getCart/us
+            Path: /getCart/users/{userId}
             Method: get
             RestApiId: !Ref CartApi
 
