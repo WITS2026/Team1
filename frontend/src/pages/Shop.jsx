@@ -11,7 +11,7 @@ function Shop() {
     const fetchProducts = async () => {
       try {
         // Updated to include the literal "{itemId}" text required by your API layout
-        const response = await fetch("https://vcy5fudxq3.execute-api.us-east-1.amazonaws.com/product/%7BitemId%7D");
+        const response = await fetch("https://69kxv33fa6.execute-api.us-east-1.amazonaws.com/Prod/product/%7BitemId%7D");
         
         if (!response.ok) {
           throw new Error("Failed to fetch shop items");

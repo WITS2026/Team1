@@ -4,7 +4,7 @@ const CURRENT_USER_ID = "guest_user";
 
 // --- API Helper Function ---
 const deleteFromAwsCart = async (userId, productId) => {
-  const baseUrl = "https://vcy5fudxq3.execute-api.us-east-1.amazonaws.com";
+  const baseUrl = "https://69kxv33fa6.execute-api.us-east-1.amazonaws.com/Prod";
   const url = `${baseUrl}/deleteFromCart/user/${userId}/product/${productId}`;
   console.log("Targeting URL:", url);
 
@@ -36,7 +36,7 @@ export default function Cart() {
   const fetchCartData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`https://vcy5fudxq3.execute-api.us-east-1.amazonaws.com/getCart/users/${CURRENT_USER_ID}`);
+      const response = await fetch(`https://69kxv33fa6.execute-api.us-east-1.amazonaws.com/Prod/getCart/users/${CURRENT_USER_ID}`);
       
       if (!response.ok) {
         throw new Error("Failed to retrieve cart items.");
