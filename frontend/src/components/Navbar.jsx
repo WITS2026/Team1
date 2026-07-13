@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ShoppingBag } from "lucide-react";
-
-const CURRENT_USER_ID = "guest_user";
+import { getCart } from "../api/cart";
 
 function Navbar() {
   const [itemCount, setItemCount] = useState(0);
@@ -11,27 +10,12 @@ function Navbar() {
   // Unified function to hit your AWS endpoint and calculate the count
   const updateCartCount = async () => {
     try {
-      const response = await fetch(
-        `https://vcy5fudxq3.execute-api.us-east-1.amazonaws.com/getCart/users/${CURRENT_USER_ID}`
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch cart data for count.");
-      }
-
-      const data = await response.json();
-
-      if (data && data.cart && Array.isArray(data.cart)) {
-        const total = data.cart.reduce(
-          (sum, item) => sum + (item.quantity || 1),
-          0
-        );
-        setItemCount(total);
-      } else {
-        setItemCount(0);
-      }
+      const cart = await getCart();
+      const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      setItemCount(total);
     } catch (error) {
-      console.error("Could not fetch cart item count:", error);
+      // Not signed in yet, or request failed - show no badge rather than erroring.
+      setItemCount(0);
     }
   };
 

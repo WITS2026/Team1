@@ -1,72 +1,63 @@
-import React, { useState, useEffect } from "react";
-import ProductCard from "../components/ProductCard";
-import { addToCart } from "../api/cart";
+import { useEffect, useState } from "react";
+import { getProducts } from "../api/products";
+import { addToCart as addToCartRequest } from "../api/cart";
 
-function Shop() {
-  const [productsList, setProductsList] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+export default function Shop() {
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const loadProducts = async () => {
       try {
-        // Updated to include the literal "{itemId}" text required by your API layout
-        const response = await fetch("https://69kxv33fa6.execute-api.us-east-1.amazonaws.com/Prod/product/%7BitemId%7D");
-        
-        if (!response.ok) {
-          throw new Error("Failed to fetch shop items");
-        }
-        
-        const data = await response.json();
-        
-        // Hoppscotch shows the root response is a direct JSON array `[`
-        setProductsList(data);
-      } catch (err) {
-        console.error("Error fetching products:", err);
-        setError("Could not load products. Please try again later.");
-      } finally {
-        setLoading(false);
+        const data = await getProducts();
+        setProducts(data || []);
+      } catch (error) {
+        console.error("Error getting products:", error);
       }
     };
 
-    fetchProducts();
+    loadProducts();
   }, []);
 
-  const handleAddToCart = async (product) => {
+  const addToCart = async (product) => {
     try {
-      await addToCart(product, 1);
-      //alert(`${product.name || product.title} added to cart!`);
-      
-      // Dispatch the custom event to tell the Navbar to fetch the fresh count instantly!
+      await addToCartRequest(product);
       window.dispatchEvent(new Event("cartUpdated"));
-      
+      alert(`${product.title} added to cart!`);
     } catch (error) {
-      console.error("Failed to add item to cart:", error);
-      alert("Could not add item to cart.");
+      console.error("Error adding to cart:", error);
+      alert("There was a problem adding this item. Please sign in first.");
     }
   };
 
-  if (loading) return <div className="text-center p-8 text-xl">Loading products...</div>;
-  if (error) return <div className="text-center p-8 text-red-500 text-xl">{error}</div>;
-
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-      <h1 className="text-4xl font-bold mb-8">Shop Jewelry</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {productsList && productsList.length > 0 ? (
-          productsList.map((item) => (
-            <ProductCard
-              key={item.id}
-              product={item}
-              onAddToCart={handleAddToCart}
-            />
-          ))
-        ) : (
-          <p className="text-center col-span-3 text-gray-500">No products found.</p>
-        )}
+    <div className="container my-5">
+      <div className="page-section">
+        <h1 className="mb-4 text-primary text-center">Shop</h1>
+
+        <div className="row">
+          {products.map((product) => (
+            <div className="col-md-4 mb-4" key={product.id}>
+              <div className="card color-card h-100 shadow-sm text-center">
+                <div className="color-card-top"></div>
+
+                <div className="card-body">
+                  <h5>{product.title}</h5>
+                  <p className="text-muted mb-4">
+                    ${Number(product.price).toFixed(2)}
+                  </p>
+
+                  <button
+                    className="btn btn-wave"
+                    onClick={() => addToCart(product)}
+                  >
+                    Add To Cart
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
-
-export default Shop;

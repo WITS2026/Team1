@@ -1,92 +1,114 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: SAM Template for Shopping Cart API and DynamoDB Backend
+Description: Jewelry Store Website - Lambda + API Gateway + DynamoDB
 
 Globals:
   Function:
+    Runtime: nodejs22.x
+    Handler: index.handler
     Timeout: 10
-    Runtime: nodejs18.x 
     Environment:
       Variables:
-        TABLE_NAME: team1 # Perfect! This is exactly right.
+        TABLE_NAME: team1
 
 Resources:
   # --- API Gateway ---
-  CartApi:
-    Type: AWS::Serverless::Api
+  CartHttpApi:
+    Type: AWS::Serverless::HttpApi
     Properties:
-      StageName: Prod 
-      Cors:
-        AllowMethods: "'GET,POST,DELETE,OPTIONS'"
-        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-        AllowOrigin: "'*'"
+      StageName: Prod
+      CorsConfiguration:
+        AllowMethods:
+          - GET
+          - POST
+          - DELETE
+          - OPTIONS
+        AllowHeaders:
+          - "*"
+        AllowOrigins:
+          - http://localhost:5173
+      Auth:
+        Authorizers:
+          CognitoAuthorizer:
+            IdentitySource: "$request.header.Authorization"
+            JwtConfiguration:
+              issuer: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/us-east-1_7B2EEFLFg"
+              audience:
+                - "4hltavidnus3u5j6jltdm1ccvc"
+        DefaultAuthorizer: CognitoAuthorizer
 
   # --- Lambda Functions ---
   DeleteFromCartFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: deleteFromCart/
-      Handler: index.handler
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: team1 # The policy goes here, inside the function!
+            TableName: team1
       Events:
         DeleteEvent:
-          Type: Api
+          Type: HttpApi
           Properties:
-            Path: /deleteFromCart/user/{userId}/product/{productId}
+            Path: /deleteFromCart/product/{productId}
             Method: delete
-            RestApiId: !Ref CartApi
+            ApiId: !Ref CartHttpApi
 
   AddToCartFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: addToCart/
-      Handler: index.handler
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: team1 # And here...
+            TableName: team1
       Events:
         AddEvent:
-          Type: Api
+          Type: HttpApi
           Properties:
-            Path: /addToCart/user/{userId}/product/{productId}
+            Path: /addToCart/product/{productId}
             Method: post
-            RestApiId: !Ref CartApi
+            ApiId: !Ref CartHttpApi
 
   GetProductFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: getProduct/
-      Handler: index.handler
       Policies:
         - DynamoDBReadPolicy:
-            TableName: team1 # And here...
+            TableName: team1
       Events:
         GetEvent:
-          Type: Api
+          Type: HttpApi
           Properties:
-            Path: /product/{itemId}
+            Path: /product
             Method: get
-            RestApiId: !Ref CartApi
+            ApiId: !Ref CartHttpApi
+            Auth:
+              Authorizer: NONE
 
   GetCartFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: getCart/
-      Handler: index.handler
       Policies:
         - DynamoDBReadPolicy:
-            TableName: team1 # And here!
+            TableName: team1
       Events:
         GetEvent:
-          Type: Api
+          Type: HttpApi
           Properties:
-            Path: /getCart/users/{userId}
+            Path: /getCart
             Method: get
-            RestApiId: !Ref CartApi
+            ApiId: !Ref CartHttpApi
 
 Outputs:
   ApiUrl:
     Description: "API Gateway endpoint URL"
-    Value: !Sub "https://${CartApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "https://${CartHttpApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+
+  UserPoolId:
+    Description: "Existing Cognito User Pool ID used for auth"
+    Value: us-east-1_7B2EEFLFg
+
+  UserPoolClientId:
+    Description: "Existing Cognito User Pool Client ID used for auth"
+    Value: 4hltavidnus3u5j6jltdm1ccvc

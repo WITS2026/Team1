@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import { Authenticator } from "@aws-amplify/ui-react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
@@ -11,7 +12,6 @@ import Cart from "./pages/Cart";
 function App() {
   return (
     <>
-      
       <Navbar />
 
       <Routes>
@@ -19,7 +19,24 @@ function App() {
         <Route path="/shop" element={<Shop />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/cart" element={<Cart />} />
+        <Route
+          path="/cart"
+          element={
+            <Authenticator>
+              {({ signOut, user }) => (
+                <>
+                  <div className="flex justify-between items-center px-8 py-2 bg-gray-100">
+                    <span>Welcome, {user?.signInDetails?.loginId}</span>
+                    <button onClick={signOut} className="text-red-500 hover:underline">
+                      Sign out
+                    </button>
+                  </div>
+                  <Cart />
+                </>
+              )}
+            </Authenticator>
+          }
+        />
       </Routes>
 
       <Footer />
