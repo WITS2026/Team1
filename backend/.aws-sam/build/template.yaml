@@ -30,9 +30,9 @@ Resources:
             IdentitySource: $request.header.Authorization
             JwtConfiguration:
               issuer:
-                Fn::Sub: https://cognito-idp.${AWS::Region}.amazonaws.com/us-east-1_7B2EEFLFg
+                Fn::Sub: https://cognito-idp.${AWS::Region}.amazonaws.com/us-east-1_KnSc6dMXX
               audience:
-              - 4hltavidnus3u5j6jltdm1ccvc
+              - 20tlbqfhrdad0tmbkg374aboeu
         DefaultAuthorizer: CognitoAuthorizer
   DeleteFromCartFunction:
     Type: AWS::Serverless::Function
@@ -111,7 +111,7 @@ Outputs:
       Fn::Sub: https://${CartHttpApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/
   UserPoolId:
     Description: Existing Cognito User Pool ID used for auth
-    Value: us-east-1_7B2EEFLFg
+    Value: us-east-1_KnSc6dMXX
   UserPoolClientId:
     Description: Existing Cognito User Pool Client ID used for auth
-    Value: 4hltavidnus3u5j6jltdm1ccvc
+    Value: 20tlbqfhrdad0tmbkg374aboeu
