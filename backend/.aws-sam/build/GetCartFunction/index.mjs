@@ -9,8 +9,8 @@ const TABLE_NAME = process.env.TABLE_NAME || "team1";
 
 export const handler = async (event) => {
     try {
-        // FIX: Checks both lowercase 'userId' and uppercase 'userID' path variables
-        const userId = event.pathParameters?.userId || event.pathParameters?.userID || "guest_user"; 
+        const claims = event.requestContext.authorizer.jwt.claims;
+        const userId = claims.sub;
 
         // 1. Fetch all items in the user's cart
         const queryParams = {

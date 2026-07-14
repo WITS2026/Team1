@@ -15,37 +15,19 @@ const corsHeaders = {
 
 export const handler = async (event) => {
   try {
-    // 1. Swapped cartId to productId to match your exact API Gateway route: /product/{productId}
-    let userId = event.pathParameters?.userId;
-    let productId = event.pathParameters?.productId;
+    const claims = event.requestContext.authorizer.jwt.claims;
+    const userId = claims.sub;
+    const productId = event.pathParameters?.productId;
 
-    // 2. Fallback parser if path parameters aren't mapping automatically
-    if ((!userId || !productId) && event.requestContext?.http?.path) {
-      const cleanPath = event.requestContext.http.path.replace(/\/$/, "");
-      const pathParts = cleanPath.split('/');
-      
-      if (!userId) {
-        userId = event.queryStringParameters?.userId || pathParts[pathParts.length - 3];
-      }
-      if (!productId) {
-        productId = event.queryStringParameters?.productId || pathParts[pathParts.length - 1];
-      }
-    }
-
-    // 3. Strict safety check
-    const invalidIds = ["cart", "resource", "to", "users", "carts", "product"];
-    if (!userId || !productId || invalidIds.includes(userId) || invalidIds.includes(productId)) {
+    if (!productId) {
       return {
         statusCode: 400,
         headers: corsHeaders,
-        body: JSON.stringify({ 
-          message: "Missing valid userId or productId.",
-          debugReceivedPath: event.requestContext?.http?.path || "Unknown path"
-        }),
+        body: JSON.stringify({ message: "Missing productId." }),
       };
     }
 
-    // 4. Aligning partition and sort keys with your item IDs
+    // Aligning partition and sort keys with your item IDs
     const partitionKey = `USER#${userId}`;
     const sortKey = `CART#ITEM#${productId}`; // Now evaluates correctly to e.g., CART#ITEM#003
 
