@@ -8,3 +8,12 @@ export async function authHeaders() {
   const token = session.tokens?.idToken?.toString();
   return { Authorization: `Bearer ${token}` };
 }
+
+export async function isSignedIn() {
+  try {
+    const session = await fetchAuthSession();
+    return !!session.tokens?.idToken;
+  } catch {
+    return false;
+  }
+}

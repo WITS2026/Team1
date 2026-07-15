@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ShoppingBag } from "lucide-react";
+import { getCurrentUser, signOut } from "aws-amplify/auth";
+import { Hub } from "aws-amplify/utils";
 import { getCart } from "../api/cart";
 
 function Navbar() {
   const [itemCount, setItemCount] = useState(0);
+  const [user, setUser] = useState(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Unified function to hit your AWS endpoint and calculate the count
   const updateCartCount = async () => {
@@ -19,10 +23,25 @@ function Navbar() {
     }
   };
 
+  const loadUser = async () => {
+    try {
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+    } catch (error) {
+      // Not signed in.
+      setUser(null);
+    }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
+
   // 1. Fetch count whenever the user changes pages (Home -> Shop -> About, etc.)
   useEffect(() => {
     updateCartCount();
-  }, [location]); 
+  }, [location]);
 
   // 2. Isolated listener: Stays active permanently and handles instant "Add to Cart" pings
   useEffect(() => {
@@ -32,6 +51,20 @@ function Navbar() {
       window.removeEventListener("cartUpdated", updateCartCount);
     };
   }, []); // Empty array means this runs ONCE on app load and stays active
+
+  // 3. Track sign-in state everywhere, refreshing whenever Amplify reports a sign-in/out
+  useEffect(() => {
+    loadUser();
+
+    const unsubscribe = Hub.listen("auth", ({ payload }) => {
+      if (payload.event === "signedIn" || payload.event === "signedOut") {
+        loadUser();
+        updateCartCount();
+      }
+    });
+
+    return unsubscribe;
+  }, []);
 
   return (
     <nav className="bg-black text-white px-8 py-4 flex justify-between items-center">
@@ -44,14 +77,28 @@ function Navbar() {
         <Link to="/contact" className="hover:text-yellow-400 transition-colors">Contact</Link>
       </div>
 
-      <Link to="/cart" className="relative p-1 hover:text-yellow-400 transition-colors">
-        <ShoppingBag />
-        {itemCount > 0 && (
-          <span className="absolute -top-1 -right-2 bg-yellow-400 text-black text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-            {itemCount}
-          </span>
+      <div className="flex items-center gap-4">
+        {user && (
+          <div className="flex items-center gap-3 text-sm">
+            <span>Welcome, {user.signInDetails?.loginId || user.username}</span>
+            <button
+              onClick={handleSignOut}
+              className="text-red-400 hover:underline"
+            >
+              Sign out
+            </button>
+          </div>
         )}
-      </Link>
+
+        <Link to="/cart" className="relative p-1 hover:text-yellow-400 transition-colors">
+          <ShoppingBag />
+          {itemCount > 0 && (
+            <span className="absolute -top-1 -right-2 bg-yellow-400 text-black text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+              {itemCount}
+            </span>
+          )}
+        </Link>
+      </div>
     </nav>
   );
 }
