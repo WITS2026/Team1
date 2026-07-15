@@ -23,17 +23,7 @@ function App() {
           path="/cart"
           element={
             <Authenticator>
-              {({ signOut, user }) => (
-                <>
-                  <div className="flex justify-between items-center px-8 py-2 bg-gray-100">
-                    <span>Welcome, {user?.signInDetails?.loginId}</span>
-                    <button onClick={signOut} className="text-red-500 hover:underline">
-                      Sign out
-                    </button>
-                  </div>
-                  <Cart />
-                </>
-              )}
+              <Cart />
             </Authenticator>
           }
         />
