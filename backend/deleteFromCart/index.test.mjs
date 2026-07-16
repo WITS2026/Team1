@@ -1,25 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { mockClient } from "aws-sdk-client-mock";
+import {
+  DynamoDBDocumentClient,
+  QueryCommand,
+  BatchWriteCommand,
+} from "@aws-sdk/lib-dynamodb";
+import { handler } from "./index.mjs";
 
-vi.mock("@aws-sdk/client-dynamodb", () => ({
-  DynamoDBClient: vi.fn(),
-}));
-
-vi.mock("@aws-sdk/lib-dynamodb", () => ({
-  DynamoDBDocumentClient: { from: vi.fn(() => ({ send: vi.fn() })) },
-  QueryCommand: vi.fn(function QueryCommand(params) {
-    this.params = params;
-  }),
-  BatchWriteCommand: vi.fn(function BatchWriteCommand(params) {
-    this.params = params;
-  }),
-}));
-
-process.env.TABLE_NAME = "team1";
-
-const { DynamoDBDocumentClient } = await import("@aws-sdk/lib-dynamodb");
-const { handler } = await import("./index.mjs");
-
-const send = DynamoDBDocumentClient.from.mock.results[0].value.send;
+const ddbMock = mockClient(DynamoDBDocumentClient);
 
 const buildEvent = (productId) => ({
   requestContext: { authorizer: { jwt: { claims: { sub: "user-123" } } } },
@@ -28,7 +15,8 @@ const buildEvent = (productId) => ({
 
 describe("deleteFromCart handler", () => {
   beforeEach(() => {
-    send.mockReset();
+    ddbMock.reset();
+    process.env.TABLE_NAME = "team1";
   });
 
   it("returns 400 when productId is missing", async () => {
@@ -36,24 +24,24 @@ describe("deleteFromCart handler", () => {
 
     expect(result.statusCode).toBe(400);
     expect(JSON.parse(result.body).message).toBe("Missing productId.");
-    expect(send).not.toHaveBeenCalled();
+    expect(ddbMock.commandCalls(QueryCommand)).toHaveLength(0);
   });
 
   it("returns 404 when the item is not found in the cart", async () => {
-    send.mockResolvedValueOnce({ Items: [] });
+    ddbMock.on(QueryCommand).resolves({ Items: [] });
 
     const result = await handler(buildEvent("42"));
 
     expect(result.statusCode).toBe(404);
     expect(JSON.parse(result.body).message).toBe("Item not found in database.");
+    expect(ddbMock.commandCalls(QueryCommand)).toHaveLength(1);
   });
 
   it("deletes the item and returns 200 on success", async () => {
-    send
-      .mockResolvedValueOnce({
-        Items: [{ PK: "USER#user-123", SK: "CART#ITEM#42" }],
-      })
-      .mockResolvedValueOnce({});
+    ddbMock.on(QueryCommand).resolves({
+      Items: [{ PK: "USER#user-123", SK: "CART#ITEM#42" }],
+    });
+    ddbMock.on(BatchWriteCommand).resolves({});
 
     const result = await handler(buildEvent("42"));
 
@@ -62,8 +50,11 @@ describe("deleteFromCart handler", () => {
       "Successfully removed item from cart.",
     );
 
-    const batchWriteCall = send.mock.calls[1][0];
-    expect(batchWriteCall.params.RequestItems.team1).toEqual([
+    expect(ddbMock.commandCalls(QueryCommand)).toHaveLength(1);
+    expect(ddbMock.commandCalls(BatchWriteCommand)).toHaveLength(1);
+
+    const batchWriteCall = ddbMock.call(1).args[0];
+    expect(batchWriteCall.input.RequestItems.team1).toEqual([
       {
         DeleteRequest: {
           Key: { PK: "USER#user-123", SK: "CART#ITEM#42" },
