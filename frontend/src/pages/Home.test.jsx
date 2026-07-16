@@ -1,3 +1,4 @@
+import React from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import Home from "./Home";
@@ -8,11 +9,14 @@ vi.mock("../hooks/useAddToCart", () => ({
   useAddToCart: vi.fn(),
 }));
 
+const renderHome = () =>
+  render(React.createElement(Home));
+
 describe("Home", () => {
   it("renders the hero heading and a card for every featured product", () => {
     useAddToCart.mockReturnValue(vi.fn());
 
-    render(<Home />);
+    renderHome();
 
     expect(
       screen.getByRole("heading", { name: /featured collection/i }),
@@ -27,7 +31,7 @@ describe("Home", () => {
     const addToCart = vi.fn();
     useAddToCart.mockReturnValue(addToCart);
 
-    render(<Home />);
+    renderHome();
 
     const buttons = screen.getAllByRole("button", { name: /add to cart/i });
     buttons[0].click();
