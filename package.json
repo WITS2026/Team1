@@ -5,5 +5,8 @@
     "test:backend": "npm --prefix backend test",
     "test:frontend": "npm --prefix frontend test",
     "test": "npm run test:backend && npm run test:frontend"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.10"
   }
 }
