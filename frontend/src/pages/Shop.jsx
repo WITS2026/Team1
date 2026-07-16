@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { getProducts } from "../api/products";
-import { addToCart as addToCartRequest } from "../api/cart";
+import { useAddToCart } from "../hooks/useAddToCart";
 
 export default function Shop() {
   const [products, setProducts] = useState([]);
+  const addToCart = useAddToCart();
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -17,17 +18,6 @@ export default function Shop() {
 
     loadProducts();
   }, []);
-
-  const addToCart = async (product) => {
-    try {
-      await addToCartRequest(product);
-      window.dispatchEvent(new Event("cartUpdated"));
-      alert(`${product.title} added to cart!`);
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      alert("There was a problem adding this item. Please sign in first.");
-    }
-  };
 
   return (
     <div className="container my-5">

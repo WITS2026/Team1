@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 .aws-sam/
+coverage/
 
 # Editor directories and files
 .vscode/*
