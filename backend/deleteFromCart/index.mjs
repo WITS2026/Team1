@@ -4,8 +4,6 @@ import { DynamoDBDocumentClient, QueryCommand, BatchWriteCommand } from "@aws-sd
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
-const TABLE_NAME = process.env.TABLE_NAME;
-
 const corsHeaders = {
   "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "*",
@@ -15,6 +13,7 @@ const corsHeaders = {
 
 export const handler = async (event) => {
   try {
+    const tableName = process.env.TABLE_NAME;
     const claims = event.requestContext.authorizer.jwt.claims;
     const userId = claims.sub;
     const productId = event.pathParameters?.productId;
@@ -33,7 +32,7 @@ export const handler = async (event) => {
 
     // --- STEP 1: Find the item to delete ---
     const queryParams = {
-      TableName: TABLE_NAME,
+      TableName: tableName,
       KeyConditionExpression: "PK = :pk AND SK = :sk",
       ExpressionAttributeValues: {
         ":pk": partitionKey,
@@ -64,7 +63,7 @@ export const handler = async (event) => {
 
     const batchParams = {
       RequestItems: {
-        [TABLE_NAME]: deleteRequests,
+        [tableName]: deleteRequests,
       },
     };
     

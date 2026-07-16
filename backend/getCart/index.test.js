@@ -1,16 +1,12 @@
-const { mockClient } = require("aws-sdk-client-mock");
-const {
+import { mockClient } from "aws-sdk-client-mock";
+import {
   DynamoDBDocumentClient,
   QueryCommand,
   BatchGetCommand,
-} = require("@aws-sdk/lib-dynamodb");
+} from "@aws-sdk/lib-dynamodb";
+import { handler } from "./index.mjs";
 
 const ddbMock = mockClient(DynamoDBDocumentClient);
-let handler;
-
-beforeAll(async () => {
-  ({ handler } = await import("./index.mjs"));
-});
 
 describe("Get Cart Lambda Handler", () => {
   beforeEach(() => {
