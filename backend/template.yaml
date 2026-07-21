@@ -11,6 +11,16 @@ Globals:
       Variables:
         TABLE_NAME: team1
 
+Parameters:
+  StripeSecretKey:
+    Type: String
+    NoEcho: true
+    Description: Stripe secret key used by the createCheckoutSession Lambda
+  FrontendUrl:
+    Type: String
+    Default: http://localhost:5173
+    Description: Base URL Stripe redirects back to after checkout
+
 Resources:
   # --- API Gateway ---
   CartHttpApi:
@@ -98,6 +108,25 @@ Resources:
           Properties:
             Path: /getCart
             Method: get
+            ApiId: !Ref CartHttpApi
+
+  CreateCheckoutSessionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: createCheckoutSession/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: team1
+      Environment:
+        Variables:
+          STRIPE_SECRET_KEY: !Ref StripeSecretKey
+          FRONTEND_URL: !Ref FrontendUrl
+      Events:
+        CreateCheckoutEvent:
+          Type: HttpApi
+          Properties:
+            Path: /createCheckoutSession
+            Method: post
             ApiId: !Ref CartHttpApi
 
 Outputs:
