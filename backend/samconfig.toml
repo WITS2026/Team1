@@ -2,7 +2,7 @@ version = 0.1
 
 [default.deploy.parameters]
 stack_name = "gemini-api"
-resolve_s3 = false                  # does not create new bucket
+resolve_s3 = true                  # does not create new bucket
 s3_bucket = "wits-sam-deployments"
 s3_prefix = "gemini-api"
 confirm_changeset = true
