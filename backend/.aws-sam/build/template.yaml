@@ -9,6 +9,19 @@ Globals:
     Environment:
       Variables:
         TABLE_NAME: team1
+Parameters:
+  StripeSecretKey:
+    Type: String
+    NoEcho: true
+    Description: Stripe secret key used by the createCheckoutSession Lambda
+  StripeWebhookSecret:
+    Type: String
+    NoEcho: true
+    Description: Signing secret for the Stripe webhook endpoint (whsec_...)
+  FrontendUrl:
+    Type: String
+    Default: http://localhost:5173
+    Description: Base URL Stripe redirects back to after checkout
 Resources:
   CartHttpApi:
     Type: AWS::Serverless::HttpApi
@@ -104,11 +117,64 @@ Resources:
               Ref: CartHttpApi
     Metadata:
       SamResourceId: GetCartFunction
+  CreateCheckoutSessionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: CreateCheckoutSessionFunction
+      Policies:
+      - DynamoDBReadPolicy:
+          TableName: team1
+      Environment:
+        Variables:
+          STRIPE_SECRET_KEY:
+            Ref: StripeSecretKey
+          FRONTEND_URL:
+            Ref: FrontendUrl
+      Events:
+        CreateCheckoutEvent:
+          Type: HttpApi
+          Properties:
+            Path: /createCheckoutSession
+            Method: post
+            ApiId:
+              Ref: CartHttpApi
+    Metadata:
+      SamResourceId: CreateCheckoutSessionFunction
+  StripeWebhookFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: StripeWebhookFunction
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: team1
+      Environment:
+        Variables:
+          STRIPE_SECRET_KEY:
+            Ref: StripeSecretKey
+          STRIPE_WEBHOOK_SECRET:
+            Ref: StripeWebhookSecret
+      Events:
+        StripeWebhookEvent:
+          Type: HttpApi
+          Properties:
+            Path: /stripeWebhook
+            Method: post
+            ApiId:
+              Ref: CartHttpApi
+            Auth:
+              Authorizer: NONE
+    Metadata:
+      SamResourceId: StripeWebhookFunction
 Outputs:
   ApiUrl:
     Description: API Gateway endpoint URL
     Value:
       Fn::Sub: https://${CartHttpApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/
+  StripeWebhookUrl:
+    Description: Register this URL as the endpoint in the Stripe Dashboard (Developers
+      > Webhooks)
+    Value:
+      Fn::Sub: https://${CartHttpApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/stripeWebhook
   UserPoolId:
     Description: Existing Cognito User Pool ID used for auth
     Value: us-east-1_KnSc6dMXX
