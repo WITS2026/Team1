@@ -2,6 +2,7 @@ node_modules/
 dist/
 dist-ssr/
 *.local
+.aws-sam/
 
 # Editor directories and files
 .vscode/*
