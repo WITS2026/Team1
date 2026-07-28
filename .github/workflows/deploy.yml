@@ -85,4 +85,8 @@ jobs:
         run: sam build
 
       - name: Deploy SAM application
-        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name gemini-api --capabilities CAPABILITY_IAM --region ${{ secrets.AWS_REGION }}
+        run: >
+          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
+          --stack-name gemini-api --capabilities CAPABILITY_IAM
+          --region ${{ secrets.AWS_REGION }}
+          --parameter-overrides StripeSecretKey=${{ secrets.STRIPE_SECRET_KEY }} StripeWebhookSecret=${{ secrets.STRIPE_WEBHOOK_SECRET }}
