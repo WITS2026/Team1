@@ -27,10 +27,17 @@ export default function Shop() {
         <div className="row">
           {products.map((product) => (
             <div className="col-md-4 mb-4" key={product.id}>
+              
               <div className="card color-card h-100 shadow-sm text-center">
                 <div className="color-card-top"></div>
 
+
                 <div className="card-body">
+                  <img
+            src={product.imageUrl}
+            alt={product.name || product.title}
+            className="w-full h-48 object-cover rounded mb-4"
+          />
                   <h5>{product.title}</h5>
                   <p className="text-muted mb-4">
                     ${Number(product.price).toFixed(2)}
