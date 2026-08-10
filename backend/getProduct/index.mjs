@@ -1,12 +1,16 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, ScanCommand } from "@aws-sdk/lib-dynamodb";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
-
+const s3Client = new S3Client({});
 const TABLE_NAME = "team1";
+const BUCKET_NAME = process.env.BUCKET_NAME;
 
 export const handler = async (event) => {
+
   const params = event.queryStringParameters || {};
 
   const category =
@@ -88,19 +92,37 @@ export const handler = async (event) => {
         return true;
       });
     }
+      const products = await Promise.all(
+            (Items || []).map(async (item) => {
+                let imageUrl = null;
+                if (item.ImageKey) {
+                    const command = new GetObjectCommand({
+                        Bucket: BUCKET_NAME,
+                        Key: item.ImageKey
+                    });
 
-    const products = Items.map((item) => ({
-      id: item.PK?.replace("ITEM#", ""),
-      title: item.Title || item.title || "No Title",
-      description: item.Description || "",
-      category: item.Category || item.category || "",
-      material: item.Material || item.material || "",
-      color: item.Color || item.color || "",
-      size: item.Size || "",
-      price: item.price || "0",
-      inventory: item.InventoryCount || "0",
-    }));
+                    imageUrl = await getSignedUrl(s3Client, command, {
+                        expiresIn: 3600 // 1 hour
+                    });
+                }
 
+                return {
+                    id: item.PK?.replace("ITEM#", ""),
+                    title: item.Title || item.title || "No Title",
+                    description: item.Description || "",
+                    category: item.Category || item.category || "",
+                    material: item.Material || item.material || "",
+                    color: item.Color || item.color || "",
+                    size: item.Size || "",
+                    price: item.price || "0",
+                    inventory: item.InventoryCount || "0",  
+                    imageUrl
+                };
+            })
+        );
+    
+
+    
     return {
       statusCode: 200,
       headers: {

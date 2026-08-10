@@ -10,6 +10,7 @@ Globals:
     Environment:
       Variables:
         TABLE_NAME: team1
+        BUCKET_NAME: gemini-api-s3bucket-wk6dwra8hw94
 
 Parameters:
   StripeSecretKey:
@@ -89,6 +90,8 @@ Resources:
       Policies:
         - DynamoDBReadPolicy:
             TableName: team1
+        - S3ReadPolicy:
+            BucketName: gemini-api-s3bucket-wk6dwra8hw94
       Events:
         GetEvent:
           Type: HttpApi
@@ -170,3 +173,8 @@ Outputs:
   UserPoolClientId:
     Description: "Existing Cognito User Pool Client ID used for auth"
     Value: 20tlbqfhrdad0tmbkg374aboeu
+
+
+  BucketName:
+    Description: Existing S3 bucket
+    Value: gemini-api-s3bucket-wk6dwra8hw94

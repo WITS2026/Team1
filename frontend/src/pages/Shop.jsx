@@ -65,6 +65,7 @@ export default function Shop() {
 
   return (
     <div className="container my-5">
+
       <h1 className="text-center text-primary mb-4">
         Shop ({products.length} products)
       </h1>
@@ -153,6 +154,11 @@ export default function Shop() {
           <div className="col-md-4 mb-4" key={product.id}>
             <div className="card shadow-sm h-100 text-center">
               <div className="card-body">
+                <img
+                  src={product.imageUrl}
+                  alt={product.name || product.title}
+                  className="w-full h-48 object-cover rounded mb-4"
+                 />
                 <h5>{product.title}</h5>
 
                 <p>${Number(product.price).toFixed(2)}</p>
@@ -163,6 +169,7 @@ export default function Shop() {
                 >
                   Add To Cart
                 </button>
+
               </div>
             </div>
           </div>
