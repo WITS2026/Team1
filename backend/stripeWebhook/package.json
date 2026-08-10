@@ -1,0 +1,9 @@
+{
+  "name": "stripe-webhook",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "stripe": "^17.4.0"
+  }
+}

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { getCart, deleteFromCart } from "../api/cart";
+import { createCheckoutSession } from "../api/payment";
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [checkingOut, setCheckingOut] = useState(false);
 
   useEffect(() => {
     const loadCart = async () => {
@@ -38,6 +40,18 @@ export default function Cart() {
     (sum, item) => sum + item.price * item.quantity,
     0,
   );
+
+  const handleCheckout = async () => {
+    setCheckingOut(true);
+    try {
+      const url = await createCheckoutSession();
+      window.location.href = url;
+    } catch (error) {
+      console.error("Error starting checkout:", error);
+      alert("There was a problem starting checkout. Please try again.");
+      setCheckingOut(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -117,7 +131,13 @@ export default function Cart() {
                   <span>Free</span>
                 </div>
 
-                <button className="btn btn-wave w-100 btn-lg">Checkout</button>
+                <button
+                  className="btn btn-wave w-100 btn-lg"
+                  onClick={handleCheckout}
+                  disabled={checkingOut}
+                >
+                  {checkingOut ? "Redirecting to checkout..." : "Checkout"}
+                </button>
               </div>
             </div>
           </div>
