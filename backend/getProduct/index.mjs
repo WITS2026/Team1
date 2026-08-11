@@ -30,11 +30,13 @@ export const handler = async (event) => {
 
   try {
     // DynamoDB query
+    // Only include item rows with metadata records.
     const scanParams = {
       TableName: TABLE_NAME,
-      FilterExpression: "SK = :sk",
+      FilterExpression: "SK = :sk AND begins_with(PK, :pkPrefix)",
       ExpressionAttributeValues: {
         ":sk": "METADATA",
+        ":pkPrefix": "ITEM#",
       },
     };
 

@@ -55,90 +55,74 @@ export default function Cart() {
 
   if (loading) {
     return (
-      <div className="container my-5">
-        <h3>Loading cart...</h3>
+      <div className="container mx-auto px-6 py-14">
+        <h3 className="text-xl text-[#efe8dc]">Loading cart...</h3>
       </div>
     );
   }
 
   return (
-    <div className="container my-5">
-      <div className="page-section">
-        <div className="d-flex flex-column flex-md-row justify-content-between align-items-start gap-4 mb-4">
+    <div className="container mx-auto px-6 py-14">
+      <div className="page-section p-8">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
           <div>
-            <h1 className="mb-2 text-primary">Your Cart</h1>
-            <p className="text-muted mb-0">
-              Review your selected items, update quantities, or remove anything
-              you don't want.
-            </p>
+            <h1 className="text-4xl font-semibold text-white mb-2">Your Cart</h1>
+            <p className="text-[#c9b18a] max-w-2xl">Review your selected pieces and proceed with confidence.</p>
           </div>
 
-          <div className="text-end">
-            <span className="badge rounded-pill bg-warning text-dark py-2 px-3">
-              {cartItems.length} item{cartItems.length !== 1 ? "s" : ""}
-            </span>
+          <div className="inline-flex items-center rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.04)] px-4 py-2 text-sm text-[#c9b18a]">
+            {cartItems.length} item{cartItems.length !== 1 ? "s" : ""}
           </div>
         </div>
 
         {cartItems.length === 0 ? (
-          <div className="text-center py-5">
-            <h3 className="mb-3">Your cart is feeling light!</h3>
-            <p className="text-muted">
-              Add a few pieces from the shop to make it glow.
-            </p>
+          <div className="rounded-[2rem] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-12 text-center text-[#c9b18a]">
+            <h3 className="text-2xl text-white mb-2">Your cart is feeling light!</h3>
+            <p>Add a few elegant pieces from the shop to complete your look.</p>
           </div>
         ) : (
-          <div className="row g-4">
-            <div className="col-lg-8">
-              <div className="list-group">
-                {cartItems.map((item) => (
-                  <div
-                    key={item.itemId}
-                    className="list-group-item list-group-item-action d-flex flex-column flex-sm-row gap-3 align-items-start align-items-sm-center p-4 rounded-4 shadow-sm"
-                  >
-                    <div className="flex-grow-1">
-                      <h5 className="mb-1">{item.title}</h5>
-                      <p className="mb-0 fw-semibold">
-                        ${Number(item.price).toFixed(2)} x {item.quantity}
-                      </p>
-                    </div>
-
-                    <div className="text-end">
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-outline-danger"
-                        onClick={() => removeItem(item.itemId)}
-                      >
-                        Remove
-                      </button>
-                    </div>
+          <div className="grid gap-8 lg:grid-cols-[1.8fr_1fr]">
+            <div className="space-y-4">
+              {cartItems.map((item) => (
+                <div
+                  key={item.itemId}
+                  className="rounded-[2rem] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.18)] flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div>
+                    <h5 className="text-xl font-semibold text-white mb-2">{item.title}</h5>
+                    <p className="text-[#c9b18a]">${Number(item.price).toFixed(2)} x {item.quantity}</p>
                   </div>
-                ))}
-              </div>
+                  <button
+                    type="button"
+                    className="btn-gold rounded-full px-5 py-2 text-sm font-semibold uppercase tracking-[0.2em]"
+                    onClick={() => removeItem(item.itemId)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
             </div>
 
-            <div className="col-lg-4">
-              <div className="card color-card h-100 shadow-sm p-4">
-                <h4 className="mb-3">Order summary</h4>
+            <div className="rounded-[2rem] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-8 shadow-[0_18px_50px_rgba(0,0,0,0.18)]">
+              <h4 className="text-2xl font-semibold text-white mb-6">Order summary</h4>
 
-                <div className="d-flex justify-content-between mb-3">
-                  <span>Subtotal</span>
-                  <strong>${total.toFixed(2)}</strong>
-                </div>
-
-                <div className="d-flex justify-content-between mb-4 text-muted">
-                  <span>Shipping</span>
-                  <span>Free</span>
-                </div>
-
-                <button
-                  className="btn btn-wave w-100 btn-lg"
-                  onClick={handleCheckout}
-                  disabled={checkingOut}
-                >
-                  {checkingOut ? "Redirecting to checkout..." : "Checkout"}
-                </button>
+              <div className="flex justify-between mb-3 text-[#c9b18a]">
+                <span>Subtotal</span>
+                <strong className="text-white">${total.toFixed(2)}</strong>
               </div>
+
+              <div className="flex justify-between mb-8 text-[#b8aa97]">
+                <span>Shipping</span>
+                <span>Free</span>
+              </div>
+
+              <button
+                className="btn-gold w-full rounded-full py-3 text-sm font-semibold uppercase tracking-[0.2em]"
+                onClick={handleCheckout}
+                disabled={checkingOut}
+              >
+                {checkingOut ? "Redirecting to checkout..." : "Checkout"}
+              </button>
             </div>
           </div>
         )}
