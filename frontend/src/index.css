@@ -1,1 +1,170 @@
 @import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+  --bg: #080605;
+  --panel: rgba(255, 255, 255, 0.05);
+  --panel-strong: rgba(255, 255, 255, 0.08);
+  --text: #efe8dc;
+  --muted: #b8aa97;
+  --accent: #ddb76f;
+  --border: rgba(255, 255, 255, 0.12);
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
+}
+
+html {
+  scroll-behavior: smooth;
+  background: radial-gradient(circle at 10% 10%, rgba(221, 183, 104, 0.18), transparent 20%),
+    radial-gradient(circle at 90% 15%, rgba(255, 255, 255, 0.08), transparent 15%),
+    linear-gradient(180deg, #090604 0%, #040302 100%);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text);
+  background: transparent;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(221, 183, 104, 0.32);
+  color: #050403;
+}
+
+.hero-banner {
+  position: relative;
+  background: linear-gradient(135deg, rgba(6, 4, 2, 0.95), rgba(14, 11, 8, 0.95));
+  overflow: hidden;
+}
+
+.hero-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 15% 30%, rgba(255, 225, 175, 0.18), transparent 22%),
+    radial-gradient(circle at 85% 40%, rgba(221, 183, 104, 0.12), transparent 20%);
+  pointer-events: none;
+}
+
+.hero-banner > div {
+  position: relative;
+  z-index: 1;
+}
+
+.page-section {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: 32px;
+  backdrop-filter: blur(18px);
+}
+
+.product-card {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(221, 183, 104, 0.35);
+  box-shadow: var(--shadow);
+}
+
+.product-card img {
+  transition: transform 0.4s ease;
+}
+
+.product-card:hover img {
+  transform: scale(1.02);
+}
+
+.btn-gold {
+  border: 1px solid rgba(221, 183, 104, 0.7);
+  background: linear-gradient(180deg, rgba(221, 183, 104, 0.2), rgba(255, 255, 255, 0.08));
+  color: var(--text);
+  transition: all 0.3s ease;
+}
+
+.btn-gold:hover {
+  background: rgba(221, 183, 104, 0.28);
+  color: #080604;
+  transform: translateY(-1px);
+}
+
+.btn-muted {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+}
+
+.form-input,
+.input-panel input,
+.input-panel textarea,
+.input-panel select {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  padding: 0.95rem 1.15rem;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  background-clip: padding-box;
+}
+
+.form-input select,
+.input-panel select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 3rem;
+  background-image: linear-gradient(45deg, transparent 50%, var(--text) 50%),
+    linear-gradient(135deg, var(--text) 50%, transparent 50%);
+  background-position: right 1.15rem center, right 0.8rem center;
+  background-size: 0.45em 0.45em;
+  background-repeat: no-repeat;
+}
+
+.form-input option,
+.input-panel select option {
+  color: var(--text);
+  background: rgba(11, 9, 7, 0.98);
+}
+
+.form-input option:checked,
+.input-panel select option:checked {
+  color: var(--text);
+  background: rgba(221, 183, 104, 0.18);
+}
+
+.input-panel textarea {
+  min-height: 140px;
+  border-radius: 1rem;
+}
+
+.form-input:focus,
+.input-panel input:focus,
+.input-panel textarea:focus,
+.input-panel select:focus {
+  border-color: rgba(221, 183, 104, 0.45);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(221, 183, 104, 0.12);
+}
+
+.text-primary {
+  color: var(--text) !important;
+}
+
+.text-secondary {
+  color: var(--muted) !important;
+}
+
+.site-footer {
+  background: rgba(0, 0, 0, 0.9);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+

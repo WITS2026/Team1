@@ -11,14 +11,12 @@ function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Unified function to hit your AWS endpoint and calculate the count
   const updateCartCount = async () => {
     try {
       const cart = await getCart();
       const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
       setItemCount(total);
     } catch (error) {
-      // Not signed in yet, or request failed - show no badge rather than erroring.
       setItemCount(0);
     }
   };
@@ -28,7 +26,6 @@ function Navbar() {
       const currentUser = await getCurrentUser();
       setUser(currentUser);
     } catch (error) {
-      // Not signed in.
       setUser(null);
     }
   };
@@ -38,24 +35,17 @@ function Navbar() {
     navigate("/");
   };
 
-  // 1. Fetch count whenever the user changes pages (Home -> Shop -> About, etc.)
   useEffect(() => {
     updateCartCount();
   }, [location]);
 
-  // 2. Isolated listener: Stays active permanently and handles instant "Add to Cart" pings
   useEffect(() => {
     window.addEventListener("cartUpdated", updateCartCount);
+    return () => window.removeEventListener("cartUpdated", updateCartCount);
+  }, []);
 
-    return () => {
-      window.removeEventListener("cartUpdated", updateCartCount);
-    };
-  }, []); // Empty array means this runs ONCE on app load and stays active
-
-  // 3. Track sign-in state everywhere, refreshing whenever Amplify reports a sign-in/out
   useEffect(() => {
     loadUser();
-
     const unsubscribe = Hub.listen("auth", ({ payload }) => {
       if (payload.event === "signedIn" || payload.event === "signedOut") {
         loadUser();
@@ -67,33 +57,41 @@ function Navbar() {
   }, []);
 
   return (
-    <nav className="bg-black text-white px-8 py-4 flex justify-between items-center">
-      <h1 className="text-2xl font-bold text-yellow-400">Gemini</h1>
+    <nav className="bg-[rgba(0,0,0,0.82)] backdrop-blur-xl px-6 py-4 md:px-10 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0 border-b border-[rgba(255,255,255,0.08)] shadow-[0_20px_65px_rgba(0,0,0,0.18)]">
+      <Link to="/" className="flex items-center gap-3 no-underline">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#dcb767] to-[#f4e4bd] text-black shadow-[0_0_24px_rgba(220,183,103,0.24)]">
+          <span className="text-lg font-black tracking-[0.35em]">G</span>
+        </div>
+        <div>
+          <h1 className="text-2xl font-semibold uppercase tracking-[0.25em] text-[#f8e5b7]">Gemini</h1>
+          <p className="text-xs uppercase tracking-[0.35em] text-[#c9b28b]">Fine Jewelry</p>
+        </div>
+      </Link>
 
-      <div className="flex gap-6">
-        <Link to="/" className="hover:text-yellow-400 transition-colors">Home</Link>
-        <Link to="/shop" className="hover:text-yellow-400 transition-colors">Shop</Link>
-        <Link to="/about" className="hover:text-yellow-400 transition-colors">About</Link>
-        <Link to="/contact" className="hover:text-yellow-400 transition-colors">Contact</Link>
+      <div className="flex flex-wrap items-center gap-6 text-sm uppercase tracking-[0.16em] text-[#d8c4a3]">
+        <Link to="/" className="transition-colors hover:text-[#f8e6b0]">Home</Link>
+        <Link to="/shop" className="transition-colors hover:text-[#f8e6b0]">Shop</Link>
+        <Link to="/about" className="transition-colors hover:text-[#f8e6b0]">About</Link>
+        <Link to="/contact" className="transition-colors hover:text-[#f8e6b0]">Contact</Link>
       </div>
 
       <div className="flex items-center gap-4">
         {user && (
-          <div className="flex items-center gap-3 text-sm">
+          <div className="hidden md:flex items-center gap-3 text-xs text-[#d8c4a3]">
             <span>Welcome, {user.signInDetails?.loginId || user.username}</span>
-            <button
-              onClick={handleSignOut}
-              className="text-red-400 hover:underline"
-            >
+            <button onClick={handleSignOut} className="text-[#f8e6b0] hover:text-white transition-colors">
               Sign out
             </button>
           </div>
         )}
 
-        <Link to="/cart" className="relative p-1 hover:text-yellow-400 transition-colors">
+        <Link
+          to="/cart"
+          className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-[#f8e6b0] transition hover:border-[#dcb767] hover:text-[#fff7e5]"
+        >
           <ShoppingBag />
           {itemCount > 0 && (
-            <span className="absolute -top-1 -right-2 bg-yellow-400 text-black text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+            <span className="absolute -top-2 -right-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#dcb767] text-[10px] font-bold text-black">
               {itemCount}
             </span>
           )}
