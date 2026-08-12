@@ -71,6 +71,9 @@ export const handler = async (event) => {
       };
     }
 
+    const requestOrigin = event.headers?.origin || event.headers?.Origin;
+    const baseUrl = requestOrigin || FRONTEND_URL;
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       client_reference_id: userId,
@@ -82,8 +85,8 @@ export const handler = async (event) => {
         },
         quantity: item.quantity,
       })),
-      success_url: `${FRONTEND_URL}/payment-success`,
-      cancel_url: `${FRONTEND_URL}/payment-cancel`,
+      success_url: `${baseUrl}/payment-success`,
+      cancel_url: `${baseUrl}/payment-cancel`,
     });
 
     return {
