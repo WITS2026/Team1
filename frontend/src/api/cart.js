@@ -39,3 +39,26 @@ export const deleteFromCart = async (productId) => {
   if (!response.ok) throw new Error("Failed to delete from cart");
   return response.json();
 };
+
+export const updateCartQuantity = async (productId, quantity) => {
+  const response = await fetch(`${API_BASE_URL}/updateCart/product/${productId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...(await authHeaders()),
+    },
+    body: JSON.stringify({ quantity }),
+  });
+
+  if (!response.ok) {
+    let bodyText;
+    try {
+      bodyText = await response.text();
+    } catch (e) {
+      bodyText = "(no response body)";
+    }
+    throw new Error(`HTTP ${response.status}: ${bodyText}`);
+  }
+
+  return response.json();
+};

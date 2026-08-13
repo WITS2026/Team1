@@ -37,6 +37,7 @@ Resources:
           - GET
           - POST
           - DELETE
+          - PUT
           - OPTIONS
         AllowHeaders:
           - "*"
@@ -81,6 +82,21 @@ Resources:
           Properties:
             Path: /addToCart/product/{productId}
             Method: post
+            ApiId: !Ref CartHttpApi
+
+  UpdateCartFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: updateCartQuantity/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: team1
+      Events:
+        UpdateEvent:
+          Type: HttpApi
+          Properties:
+            Path: /updateCart/product/{productId}
+            Method: put
             ApiId: !Ref CartHttpApi
 
   GetProductFunction:
