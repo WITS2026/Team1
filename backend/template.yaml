@@ -42,6 +42,7 @@ Resources:
           - "*"
         AllowOrigins:
           - http://localhost:5173
+          - https://main.d2vrtlwrxovwes.amplifyapp.com
       Auth:
         Authorizers:
           CognitoAuthorizer:
