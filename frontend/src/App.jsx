@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { Authenticator } from "@aws-amplify/ui-react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import { SnackbarProvider } from "./context/SnackbarContext";
 
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
@@ -13,7 +14,7 @@ import PaymentCancel from "./pages/PaymentCancel";
 
 function App() {
   return (
-    <>
+    <SnackbarProvider>
       <Navbar />
 
       <Routes>
@@ -34,7 +35,7 @@ function App() {
       </Routes>
 
       <Footer />
-    </>
+    </SnackbarProvider>
   );
 }
 

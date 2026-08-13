@@ -168,3 +168,36 @@ body {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.snackbar {
+  position: fixed;
+  left: 50%;
+  bottom: 2rem;
+  transform: translateX(-50%);
+  z-index: 1000;
+  padding: 0.85rem 1.5rem;
+  border-radius: 999px;
+  background: rgba(11, 9, 7, 0.96);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+  font-size: 0.9rem;
+  animation: snackbar-in 0.25s ease-out;
+}
+
+.snackbar-error {
+  border-color: rgba(220, 90, 90, 0.5);
+  color: #f3c9c9;
+}
+
+@keyframes snackbar-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+

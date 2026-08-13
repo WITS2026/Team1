@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { getCart, deleteFromCart } from "../api/cart";
 import { createCheckoutSession } from "../api/payment";
+import { useSnackbar } from "../context/SnackbarContext";
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [checkingOut, setCheckingOut] = useState(false);
+  const showSnackbar = useSnackbar();
 
   useEffect(() => {
     const loadCart = async () => {
@@ -23,16 +25,19 @@ export default function Cart() {
   }, []);
 
   const removeItem = async (itemId) => {
+    const item = cartItems.find((cartItem) => cartItem.itemId === itemId);
+
     try {
       await deleteFromCart(itemId);
 
       setCartItems((current) =>
-        current.filter((item) => item.itemId !== itemId),
+        current.filter((cartItem) => cartItem.itemId !== itemId),
       );
       window.dispatchEvent(new Event("cartUpdated"));
+      showSnackbar(`${item?.title || "Item"} removed from cart.`);
     } catch (error) {
       console.error("Error deleting item:", error);
-      alert("There was a problem removing this item.");
+      showSnackbar("There was a problem removing this item.", "error");
     }
   };
 
