@@ -3,6 +3,7 @@ import Hero from "../components/Hero";
 import ProductCard from "../components/ProductCard";
 import { getProducts } from "../api/products";
 import { useAddToCart } from "../hooks/useAddToCart";
+import { Link } from "react-router-dom";
 
 function Home() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
@@ -43,11 +44,23 @@ function Home() {
           ) : featuredProducts.length === 0 ? (
             <p className="text-center text-[#b8aa97]">No featured products available right now.</p>
           ) : (
-            <div className="grid gap-8 md:grid-cols-3">
-              {featuredProducts.map((item) => (
-                <ProductCard key={item.id} product={item} onAddToCart={addToCart} />
-              ))}
-            </div>
+            <>
+              <div className="grid gap-8 md:grid-cols-3">
+                {featuredProducts.map((item) => (
+                  <ProductCard key={item.id} product={item} onAddToCart={addToCart} />
+                ))}
+              </div>
+
+              <div className="mt-10 flex justify-center">
+                <Link
+                  to="/shop"
+                  className="inline-block bg-[#c9b18a] text-black font-semibold px-6 py-3 rounded-full hover:opacity-90"
+                  aria-label="See more products"
+                >
+                  See more
+                </Link>
+              </div>
+            </>
           )}
         </div>
       </section>
