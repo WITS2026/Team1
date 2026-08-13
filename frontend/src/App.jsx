@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { Authenticator } from "@aws-amplify/ui-react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
@@ -15,6 +16,7 @@ function App() {
   return (
     <>
       <Navbar />
+      <ScrollToTop />
 
       <Routes>
         <Route path="/" element={<Home />} />
